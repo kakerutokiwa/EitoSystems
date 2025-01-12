@@ -1,0 +1,146 @@
+/* 全体の設定 */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: black;
+    color: #00faff;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* サイドバー */
+.sidebar {
+    width: 25%;
+    position: relative;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: transparent;
+}
+
+.sidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background-color: #00faff;
+    box-shadow: 0 0 8px #00faff, 0 0 12px #00faff;
+}
+
+.logo {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #00faff;
+}
+
+.nav a {
+    display: block;
+    font-size: 1rem;
+    color: #00faff;
+    text-decoration: none;
+    margin: 10px 0;
+    padding: 5px 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav a:hover {
+    background-color: rgba(0, 250, 255, 0.2);
+    cursor: pointer;
+}
+
+/* メインコンテンツ */
+.content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.centered-content {
+    text-align: center;
+    position: relative;
+    color: #00faff;
+}
+
+/* 外枠のスタイル */
+.bordered-box {
+    padding: 20px;
+    position: relative;
+    clip-path: polygon(
+        0% 0%, 
+        calc(100% - 15px) 0%, 
+        100% 15px, 
+        100% 100%, 
+        15px 100%, 
+        0% calc(100% - 15px)
+    );
+    border: 3px solid #00faff;
+    box-shadow: 0 0 8px #00faff, 0 0 12px #00faff;
+    z-index: 1;
+}
+
+/* 外枠の外側の線 */
+.outer-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.line {
+    position: absolute;
+    background-color: #00faff;
+    box-shadow: 0 0 8px #00faff, 0 0 12px #00faff;
+}
+
+/* 各線の位置 */
+.line.top {
+    width: 110%;
+    height: 3px;
+    top: -15px; /* 外枠より上 */
+    left: -5%;
+}
+
+.line.right {
+    width: 3px;
+    height: 110%;
+    top: -5%;
+    right: -15px; /* 外枠より右 */
+}
+
+.line.bottom {
+    width: 110%;
+    height: 3px;
+    top: 150px; /* 外枠より下 */
+    left: -5%;
+}
+
+.line.left {
+    width: 3px;
+    height: 110%;
+    top: -5%;
+    left: -15px; /* 外枠より左 */
+}
+
+/* テキスト */
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 1rem;
+    line-height: 1.5;
+}
