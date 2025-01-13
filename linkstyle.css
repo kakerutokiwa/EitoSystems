@@ -74,9 +74,9 @@ body {
 
 .button-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);  /* 2列に設定 */
-    gap: 20px;
-    justify-items: center; /* 各ボタンを中央揃え */
+    grid-template-columns: repeat(3, 1fr);  /* 横に3つのボタンを並べる */
+    gap: 20px;  /* ボタン間のスペース */
+    justify-items: center;  /* ボタンを中央揃え */
 }
 
 .link-button {
