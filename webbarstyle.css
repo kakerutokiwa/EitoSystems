@@ -1,68 +1,25 @@
-/* 背景色と全体の設定 */
+/* ベーススタイル */
 body {
     background-color: black;
     color: #00faff;
     font-family: Arial, sans-serif;
-    text-align: center;
     margin: 0;
+    padding: 0;
 }
 
-/* タイトルの設定 */
-h1 {
-    color: #00faff;
-    font-size: 3rem;
+header h1 {
+    text-align: center;
     margin-top: 20px;
+    font-size: 36px;
+    color: #00faff;
 }
 
-/* ボタンとテキストのコンテナ */
-.container {
-    margin-top: 50px;
-}
-
-/* ボタンの行の設定 */
+/* ボタンコンテナ */
 .button-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-}
-
-/* ボタンのスタイル */
-.button {
-    display: block;
-    padding: 15px 30px;
-    margin: 10px;
-    text-decoration: none;
-    color: #00faff;
-    background-color: transparent;
-    border: 3px solid #00faff;
-    box-shadow: 0 0 8px #00faff, 0 0 12px #00faff;
-    clip-path: polygon(
-        0% 0%, 
-        calc(100% - 15px) 0%, 
-        100% 15px, 
-        100% 100%, 
-        15px 100%, 
-        0% calc(100% - 15px)
-    );
-    font-size: 1.2rem;
-    transition: transform 0.2s;
-}
-
-.button:hover {
-    transform: scale(1.1);
-}
-
-/* ボタンの下のテキスト */
-.text {
-    margin-top: 5px;
-    color: #00faff;
-    font-size: 0.9rem;
-}
-
-/* 各ボタンのアイテムの設定 */
-.button-item {
-    width: 23%;
-    margin: 10px;
+    margin-top: 30px;
 }
 
 .button-row {
@@ -72,3 +29,32 @@ h1 {
     margin-bottom: 20px;
 }
 
+.button-item {
+    width: 23%;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.button {
+    display: inline-block;
+    background-color: transparent;
+    color: #00faff;
+    padding: 10px 20px;
+    border: 3px solid #00faff;
+    border-radius: 5px;
+    box-shadow: 0 0 8px #00faff, 0 0 12px #00faff;
+    text-decoration: none;
+    clip-path: polygon(0% 0%, calc(100% - 15px) 0%, 100% 15px, 100% 100%, 15px 100%, 0% calc(100% - 15px));
+    font-size: 12px; /* フォントサイズを小さく */
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #00faff;
+    color: black;
+}
+
+.text {
+    margin-top: 5px;
+    font-size: 10px;
+}
