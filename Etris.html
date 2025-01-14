@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Etris</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: black;
+    }
+
+    .game-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Game Canvas (Tetris Game Screen) */
+    canvas {
+      border: 2px solid #00faff;
+      box-shadow: 0 0 15px #00faff;
+      background-color: black;
+    }
+
+    /* Right-side Instructions Frame */
+    .game-frame {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-left: 20px;
+      background-color: black;
+      border: 3px solid #00faff;
+      box-shadow: 0 0 8px #00faff, 0 0 12px #00faff;
+      clip-path: polygon(
+        0% 0%, 
+        calc(100% - 15px) 0%, 
+        100% 15px, 
+        100% 100%, 
+        15px 100%, 
+        0% calc(100% - 15px)
+      );
+      z-index: 1;
+    }
+
+    h1, h2 {
+      color: #00faff;
+      text-align: center;
+      margin: 0;
+      padding: 10px 0;
+    }
+
+    .text-box {
+      padding: 20px;
+      color: #00faff;
+    }
+
+    .text-box h2 {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <!-- Game Canvas -->
+    <canvas id="tetris" width="320" height="640"></canvas>
+
+    <!-- Game Instructions Frame (Right Side) -->
+    <div class="game-frame">
+      <h1>Eitoris</h1>
+      <div class="text-box">
+        <h2>Controls</h2>
+        <p>A for Left Move</p>
+        <p>D for Right Move</p>
+        <p>S for Down Move</p>
+        <p>X for Rotate</p>
+        <p>Z for Hard Drop</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('tetris');
+    const context = canvas.getContext('2d');
+
+    // Adjust the canvas size dynamically
+    const canvasWidth = 300; // Desired width
+    const canvasHeight = 600; // Desired height
+    const cols = 10; // Number of columns
+    const rows = 20; // Number of rows
+    const scale = canvasWidth / cols; // Calculate scale factor
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    context.scale(scale, scale); // Apply scaling to fit the canvas size
+
+    // Create empty grid matrix
+    function createMatrix(rows, cols) {
+      const matrix = [];
+      while (rows--) {
+        matrix.push(new Array(cols).fill(0));
+      }
+      return matrix;
+    }
+
+    const tetrominoes = {
+      T: [
+        [0, 1, 0],
+        [1, 1, 1],
+      ],
+      O: [
+        [1, 1],
+        [1, 1],
+      ],
+      I: [
+        [1, 1, 1, 1],
+      ],
+      L: [
+        [0, 0, 1],
+        [1, 1, 1],
+      ],
+      J: [
+        [1, 0, 0],
+        [1, 1, 1],
+      ],
+      Z: [
+        [1, 1, 0],
+        [0, 1, 1],
+      ],
+      S: [
+        [0, 1, 1],
+        [1, 1, 0],
+      ],
+    };
+
+    const colors = ['#00faff'];
+
+    function drawGrid() {
+      context.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      context.lineWidth = 0.05;
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          context.strokeRect(x, y, 1, 1);
+        }
+      }
+    }
+
+    function drawMatrix(matrix, offset) {
+      matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value !== 0) {
+            context.fillStyle = colors[0];
+            context.shadowBlur = 15;
+            context.shadowColor = colors[0];
+            context.fillRect(x + offset.x, y + offset.y, 1, 1);
+
+            // Draw block grid lines
+            context.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            context.lineWidth = 0.05;
+            context.strokeRect(x + offset.x, y + offset.y, 1, 1);
+          }
+        });
+      });
+    }
+
+    function merge(grid, player) {
+      player.matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value !== 0) {
+            grid[y + player.pos.y][x + player.pos.x] = value;
+          }
+        });
+      });
+    }
+
+    function collide(grid, player) {
+      const [m, o] = [player.matrix, player.pos];
+      for (let y = 0; y < m.length; ++y) {
+        for (let x = 0; x < m[y].length; ++x) {
+          if (
+            m[y][x] !== 0 &&
+            (grid[y + o.y] && grid[y + o.y][x + o.x]) !== 0
+          ) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function rotate(matrix) {
+      return matrix[0].map((_, i) => matrix.map(row => row[i]).reverse());
+    }
+
+    function playerDrop() {
+      player.pos.y++;
+      if (collide(grid, player)) {
+        player.pos.y--;
+        merge(grid, player);
+        playerReset();
+        gridSweep();
+      }
+      dropCounter = 0;
+    }
+
+    function playerMove(dir) {
+      player.pos.x += dir;
+      if (collide(grid, player)) {
+        player.pos.x -= dir;
+      }
+    }
+
+    function playerRotate() {
+      const prevMatrix = player.matrix;
+      player.matrix = rotate(player.matrix);
+      if (collide(grid, player)) {
+        player.matrix = prevMatrix;
+      }
+    }
+
+    function playerHardDrop() {
+      while (!collide(grid, player)) {
+        player.pos.y++;
+      }
+      player.pos.y--; // Adjust back after collision
+      merge(grid, player);
+      playerReset();
+      gridSweep();
+      dropCounter = 0;
+    }
+
+    function playerReset() {
+      const pieces = 'IOTJLSZ';
+      player.matrix = tetrominoes[pieces[(Math.random() * pieces.length) | 0]];
+      player.pos.y = 0;
+      player.pos.x = Math.floor(Math.random() * (cols - player.matrix[0].length));
+      if (collide(grid, player)) {
+        grid.forEach(row => row.fill(0));
+      }
+    }
+
+    function gridSweep() {
+      outer: for (let y = grid.length - 1; y >= 0; --y) {
+        for (let x = 0; x < grid[y].length; ++x) {
+          if (grid[y][x] === 0) {
+            continue outer;
+          }
+        }
+        const row = grid.splice(y, 1)[0].fill(0);
+        grid.unshift(row);
+      }
+    }
+
+    function draw() {
+      context.fillStyle = 'black';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      drawGrid(); // Draw the background grid
+      drawMatrix(grid, { x: 0, y: 0 });
+      drawMatrix(player.matrix, player.pos);
+    }
+
+    let dropCounter = 0;
+    let dropInterval = 1000;
+    let lastTime = 0;
+
+    function update(time = 0) {
+      const deltaTime = time - lastTime;
+      lastTime = time;
+
+      dropCounter += deltaTime;
+      if (dropCounter > dropInterval) {
+        playerDrop();
+      }
+
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    const grid = createMatrix(rows, cols);
+
+    const player = {
+      pos: { x: 0, y: 0 },
+      matrix: null,
+    };
+
+    const keyState = {};
+
+    document.addEventListener('keydown', event => {
+      keyState[event.key] = true;
+
+      if (event.key === 'x') {
+        playerRotate();
+      }
+      if (event.key === 'z') {
+        playerHardDrop();
+      }
+    });
+
+    document.addEventListener('keyup', event => {
+      keyState[event.key] = false;
+    });
+
+    function handleKeyInput() {
+      if (keyState['a']) {
+        playerMove(-1);
+      }
+      if (keyState['d']) {
+        playerMove(1);
+      }
+      if (keyState['s']) {
+        playerDrop();
+      }
+    }
+
+    setInterval(handleKeyInput, 100);
+
+    playerReset();
+    update();
+  </script>
+</body>
+</html>
